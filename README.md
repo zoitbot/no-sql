@@ -1,4 +1,4 @@
-# DBA Request 🗄️
+# NO-SQL 🗄️
 
 Simulador (de humor) de pedidos al equipo de DBA. Cada pedido consume tokens, el DBA reniega,
 casi siempre contesta **NO**, y si pedís demasiado te quedás sin tokens hasta el día siguiente.

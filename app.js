@@ -616,7 +616,7 @@
   function textoParaCompartir() {
     const r = resumen();
     return [
-      '🗄️ Mi día con el DBA',
+      '🗄️ NO-SQL — Mi día con el DBA',
       `Pedidos: ${numero(r.pedidos)} · Tokens gastados: ${numero(r.gastados)}`,
       `❌ ${r.rechazados} rechazados · 😤 ${r.renegados} renegados · ✅ ${r.aprobados} aprobados de mala gana`,
       estado.tokens <= 0 ? '💀 Me quedé sin tokens.' : `Me quedan ${numero(estado.tokens)} tokens.`,
