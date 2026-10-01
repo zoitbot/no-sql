@@ -134,6 +134,18 @@
 
   const RESPUESTAS_NO = ['NO.', 'NO.', 'NO.', 'No.', 'no', 'NO. Siguiente.', 'Ni ahí.', 'No, y no insistas.'];
 
+  // GIFs de GIPHY con los que el DBA contesta en lugar de escribir. `id` es el del GIF en giphy.com.
+  const GIFS_NO = [
+    { id: 'fXnRObM8Q0RkOmR5nf', descripcion: 'Bugs Bunny diciendo "NO"' },
+    { id: 'VzkTZ1DFYeBY5ZId6j', descripcion: 'Bugs Bunny, de perfil, diciendo "NO"' },
+    { id: 'nR4L10XlJcSeQ', descripcion: 'Un gato negando con la cabeza' },
+    { id: '8vUEXZA2me7vnuUvrs', descripcion: 'Michael Scott gritando "NO!"' },
+    { id: 'vyTnNTrs3wqQ0UIvwE', descripcion: 'Michael Scott repitiendo "NO! NO!"' },
+    { id: 'vPN3zK9dNL236', descripcion: 'Grumpy Cat diciendo "NOPE."' },
+    { id: 'gnE4FFhtFoLKM', descripcion: 'Un minion diciendo "EHH... NO"' },
+  ];
+  const PROBABILIDAD_GIF = 0.4;
+
   const RESPUESTAS_GENERICAS = [
     '¿Y el ticket? Sin ticket no existís.',
     '¿Lo probaste en desarrollo aunque sea? No me contestes, ya sé que no.',
@@ -308,7 +320,9 @@
     }
     if (azar < probAprobado + probNo) {
       const almuerzo = paciencia < 15 && Math.random() < 0.35;
-      return { estado: 'rechazado', respuesta: almuerzo ? RESPUESTA_ALMUERZO : elegir(RESPUESTAS_NO) };
+      if (almuerzo) return { estado: 'rechazado', respuesta: RESPUESTA_ALMUERZO };
+      if (Math.random() < PROBABILIDAD_GIF) return { estado: 'rechazado', respuesta: 'NO.', gif: elegir(GIFS_NO).id };
+      return { estado: 'rechazado', respuesta: elegir(RESPUESTAS_NO) };
     }
     if (urgente && Math.random() < 0.6) {
       return { estado: 'renegado', respuesta: elegir(RESPUESTAS_URGENTE) };
@@ -335,7 +349,9 @@
       const costo = calcularCosto(texto, pedido, urgente);
       const cortado = costo > estado.tokens;
       const cobrado = Math.min(costo, estado.tokens);
-      let { estado: resultado, respuesta } = responder(pedido, urgente);
+      let { estado: resultado, respuesta, gif } = responder(pedido, urgente);
+      // Sin tokens no alcanza para un GIF: queda el "NO." de texto.
+      if (cortado) gif = undefined;
       if (cortado && respuesta.length > 6) {
         respuesta = `${respuesta.slice(0, Math.ceil(respuesta.length / 2)).trimEnd()}—`;
       }
@@ -351,6 +367,7 @@
         hora: `${dosDigitos(ahora.getHours())}:${dosDigitos(ahora.getMinutes())}`,
         texto,
         respuesta,
+        gif,
         estado: resultado,
         costo: cobrado,
         entrada: Math.min(cobrado, Math.ceil(texto.split(/\s+/).length * 1.3)),
@@ -419,12 +436,31 @@
     mensajes.scrollTop = mensajes.scrollHeight;
   }
 
-  function agregarMensaje({ autor, texto, meta, sello }) {
+  function ponerTexto(burbuja, texto, autor) {
+    burbuja.className = 'burbuja';
+    burbuja.textContent = texto;
+    if (autor === 'dba' && texto.length <= 14 && /^no\b/i.test(texto)) burbuja.classList.add('no-seco');
+  }
+
+  // Si el GIF no carga (sin conexión, GIPHY bloqueado), queda la respuesta de texto.
+  function ponerGif(burbuja, gif, texto) {
+    const imagen = crear('img');
+    imagen.alt = gif.descripcion;
+    imagen.addEventListener('load', bajarChat);
+    imagen.addEventListener('error', () => ponerTexto(burbuja, texto, 'dba'));
+    imagen.src = `https://media.giphy.com/media/${gif.id}/200.gif`;
+    burbuja.className = 'burbuja burbuja-gif';
+    burbuja.replaceChildren(imagen);
+  }
+
+  function agregarMensaje({ autor, texto, meta, sello, gif }) {
     const mensaje = crear('div', `mensaje mensaje-${autor}`);
     if (autor === 'dba') mensaje.append(crear('span', 'avatar', '🧔'));
     const cuerpo = crear('div', 'cuerpo');
-    const burbuja = crear('div', 'burbuja', texto);
-    if (autor === 'dba' && texto.length <= 14 && /^no\b/i.test(texto)) burbuja.classList.add('no-seco');
+    const burbuja = crear('div');
+    const gifConocido = gif && GIFS_NO.find((g) => g.id === gif);
+    if (gifConocido) ponerGif(burbuja, gifConocido, texto);
+    else ponerTexto(burbuja, texto, autor);
     cuerpo.append(burbuja);
     if (meta || sello) {
       const linea = crear('div', 'meta');
@@ -454,7 +490,7 @@
   function agregarRespuesta(ticket) {
     let meta = `−${numero(ticket.costo)} tokens (entrada ${numero(ticket.entrada)} · renegada ${numero(ticket.costo - ticket.entrada)})`;
     if (ticket.cortado) meta += ' · respuesta cortada: sin tokens';
-    agregarMensaje({ autor: 'dba', texto: ticket.respuesta, meta, sello: ticket.estado });
+    agregarMensaje({ autor: 'dba', texto: ticket.respuesta, meta, sello: ticket.estado, gif: ticket.gif });
   }
 
   function pintarChat() {

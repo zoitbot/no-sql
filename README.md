@@ -38,4 +38,7 @@ Todo el contenido está al principio de `app.js`:
 - `TOKENS_DIARIOS`: saldo inicial de cada día.
 - `PEDIDOS`: pedidos frecuentes, con su costo y las respuestas propias de cada uno.
 - `RESPUESTAS_NO`, `RESPUESTAS_GENERICAS`, `RESPUESTAS_APROBADO`: las frases del DBA.
+- `GIFS_NO`: los GIFs de GIPHY con los que el DBA dice que no (se cargan desde giphy.com, así
+  que necesitan conexión; si no cargan, se muestra un `NO.` de texto). `PROBABILIDAD_GIF` define
+  qué tan seguido aparecen.
 - `RECARGAS`: las formas de conseguir más tokens.

@@ -173,6 +173,15 @@ code, .mono { font-family: var(--mono); }
   color: var(--no);
   line-height: 1.1;
 }
+.burbuja.burbuja-gif { padding: 4px; }
+.burbuja-gif img {
+  display: block;
+  height: 180px;
+  width: auto;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
 
 .meta {
   margin-top: 4px;
