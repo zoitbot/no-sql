@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DBA Request — Pedile algo al DBA (si te quedan tokens)</title>
+  <meta name="description" content="Simulador de pedidos al equipo de DBA. Cada pedido consume tokens. Si pedís demasiado, te quedás sin tokens.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗄️</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">
+      <span class="logo" aria-hidden="true">🗄️</span>
+      <div>
+        <h1>DBA Request</h1>
+        <p class="modelo">modelo: <code>dba-renegón-v2</code> · siempre de guardia, nunca de humor</p>
+      </div>
+    </div>
+
+    <div class="saldo" id="saldo" data-nivel="alto">
+      <div class="saldo-fila">
+        <span class="saldo-etiqueta">Tokens disponibles</span>
+        <span class="saldo-valor"><strong id="tokens-valor">10.000</strong> / <span id="tokens-total">10.000</span></span>
+      </div>
+      <div class="medidor" role="progressbar" aria-label="Tokens disponibles" aria-valuemin="0" aria-valuemax="10000" aria-valuenow="10000" id="tokens-medidor">
+        <div class="medidor-relleno" id="tokens-relleno"></div>
+      </div>
+      <div class="saldo-fila">
+        <span class="saldo-nota">Se recargan en <span id="cuenta-regresiva" class="mono">--:--:--</span></span>
+        <button type="button" class="boton-enlace" id="abrir-recargas">Conseguir tokens</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="disposicion">
+    <section class="panel chat" aria-label="Conversación con el DBA">
+      <div class="mensajes" id="mensajes" aria-live="polite"></div>
+
+      <div class="rapidos" id="rapidos" aria-label="Pedidos frecuentes"></div>
+
+      <form class="redactor" id="formulario" autocomplete="off">
+        <label class="solo-lectores" for="texto">Tu pedido al DBA</label>
+        <textarea id="texto" rows="2" maxlength="280" placeholder="Escribí tu pedido al DBA…"></textarea>
+        <button type="submit" class="boton" id="enviar">Enviar</button>
+      </form>
+      <p class="aviso">Cada pedido consume tokens. Las respuestas también. Sobre todo las respuestas.</p>
+    </section>
+
+    <aside class="lateral">
+      <section class="panel tarjeta" aria-labelledby="titulo-paciencia">
+        <h2 id="titulo-paciencia">Paciencia del DBA</h2>
+        <div class="animo">
+          <span class="animo-emoji" id="animo-emoji" aria-hidden="true">🧉</span>
+          <div>
+            <strong id="animo-estado">Tranquilo, tomando mate</strong>
+            <span class="animo-recargo" id="animo-recargo">Sin recargo</span>
+          </div>
+        </div>
+        <div class="medidor" role="progressbar" aria-label="Paciencia del DBA" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="paciencia-medidor" data-nivel="alto">
+          <div class="medidor-relleno" id="paciencia-relleno"></div>
+        </div>
+      </section>
+
+      <section class="panel tarjeta" aria-labelledby="titulo-consumo">
+        <h2 id="titulo-consumo">Tu consumo de hoy</h2>
+        <dl class="cifras">
+          <div><dt>Pedidos</dt><dd id="cifra-pedidos">0</dd></div>
+          <div><dt>Tokens gastados</dt><dd id="cifra-gastados">0</dd></div>
+          <div><dt>Veces que dijo NO</dt><dd id="cifra-no">0</dd></div>
+        </dl>
+        <button type="button" class="boton boton-secundario" id="compartir">Compartir mi día con el DBA</button>
+      </section>
+
+      <section class="panel tarjeta" aria-labelledby="titulo-historial">
+        <h2 id="titulo-historial">Historial de pedidos</h2>
+        <ol class="historial" id="historial"></ol>
+        <p class="vacio" id="historial-vacio">Todavía no pediste nada. El DBA lo agradece.</p>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="pie">
+    <p>Aplicación de humor. No se consultó a ningún DBA para hacerla (habría dicho que NO).</p>
+    <button type="button" class="boton-enlace" id="reiniciar">Reiniciar todo</button>
+  </footer>
+
+  <dialog class="dialogo" id="dialogo" aria-labelledby="dialogo-titulo">
+    <h2 id="dialogo-titulo">Conseguir tokens</h2>
+    <p id="dialogo-texto"></p>
+    <p class="dialogo-cuenta">Recarga automática en <span id="dialogo-cuenta" class="mono">--:--:--</span></p>
+    <div class="recargas" id="recargas"></div>
+    <p class="recarga-resultado" id="recarga-resultado" role="status"></p>
+    <div class="dialogo-acciones">
+      <button type="button" class="boton boton-secundario" id="dialogo-compartir">Compartir mi día con el DBA</button>
+      <button type="button" class="boton" id="dialogo-cerrar">Cerrar</button>
+    </div>
+  </dialog>
+
+  <div class="aviso-flotante" id="aviso-flotante" role="status" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
